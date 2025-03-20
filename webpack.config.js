@@ -1,51 +1,53 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+const path = require('node:path');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   output: {
-    filename: 'bundle.js', 
-    path: path.resolve(__dirname, 'dist'), 
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
+    clean: true,
   },
   module: {
     rules: [
       {
-        test: /\.css$/, 
-        use: [
-          MiniCssExtractPlugin.loader, 
-          'css-loader', 
-        ],
-      },
-      {
-        test: /\.js$/, 
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env'],
-          }, 
-        }, 
+        },
       },
+      {
+        test: /\.html$/,
+        use: ['html-loader'],
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+      }
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: './src/index.html', 
-    }),
-    new MiniCssExtractPlugin({
-      filename: 'style.css', 
-    }),
+    new HtmlWebPackPlugin({
+      template: './src/index.html',
+      filename: './index.html',
+    })
   ],
   devServer: {
     static: {
       directory: path.join(__dirname, 'dist'),
     },
-    open: true, 
+    compress: true,
+    port: 3000,
+    open: true,
+    hot: true,
   },
-  mode: 'production', 
-  optimization: {
-    minimize: true, 
-    minimizer: [new TerserPlugin()], 
-  },
+  mode: 'development',
 };
